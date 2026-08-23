@@ -1,0 +1,24 @@
+{
+  "name": "playwright-automation-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "test:functional": "playwright test tests/functional --project=chromium",
+    "test:e2e": "playwright test tests/e2e --project=chromium",
+    "test:headed": "playwright test tests/e2e/complete-checkout.spec.ts --project=chromium --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "dotenv": "^17.4.2"
+  }
+}
