@@ -1,5 +1,7 @@
 # Swag Labs Playwright Automation Portfolio Project
 
+[![Playwright Tests](https://github.com/iamabhishekmittal/playwright-swag-labs-automation-demo/actions/workflows/playwright.yml/badge.svg)](https://github.com/iamabhishekmittal/playwright-swag-labs-automation-demo/actions/workflows/playwright.yml)
+
 ## Project overview
 
 This independent personal portfolio project demonstrates browser-test automation with Playwright and TypeScript against [SauceDemo](https://www.saucedemo.com/), also known as Swag Labs.
@@ -215,17 +217,6 @@ This focused portfolio suite does not currently include:
 - Application deployment or continuous delivery
 
 If the suite grows, repeated setup and page interactions could be moved into fixtures or Page Objects. Additional test layers or scheduled execution should be introduced only when project scope and risk justify them.
-
-## Evidence recommendations
-
-Before making the repository public, consider adding carefully cropped or redacted evidence of:
-
-1. A successful GitHub Actions run.
-2. Playwright UI Mode focused on the order-summary assertion.
-3. The HTML report showing the named E2E steps.
-4. Optionally, a short GIF of the headed E2E run.
-
-Do not include local paths, usernames, email addresses, credentials, unrelated tabs or private repository information. Add a CI badge only after the repository is public and the badge URL has been verified.
 
 ## Licence
 
