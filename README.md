@@ -1,73 +1,123 @@
 # Swag Labs Playwright Automation Portfolio Project
 
-An independent portfolio project built with Playwright and TypeScript to validate critical customer journeys in the Swag Labs training application. The suite combines focused functional coverage with a complete end-to-end checkout journey and is ready for local demonstrations and GitHub Actions CI/CD.
+## Project overview
 
-## Application under test
+This independent personal portfolio project demonstrates browser-test automation with Playwright and TypeScript against [SauceDemo](https://www.saucedemo.com/), also known as Swag Labs.
 
-The tests run against [Swag Labs](https://www.saucedemo.com), a public demonstration storefront designed for browser-automation practice.
+SauceDemo is a third-party public training application. It is not owned, maintained or developed by the owner of this repository.
+
+## Current scope
+
+- 8 focused functional scenarios
+- 1 complete checkout end-to-end (E2E) journey
+- 9 scenarios across Chromium, Firefox and WebKit
+- 27 cross-browser executions: `9 scenarios × 3 browser engines = 27 executions`
+- Latest local validation: 27/27 passing executions
+- GitHub Actions continuous integration (CI)
+- Playwright HTML reporting and tracing on the first retry
+- Playwright UI Mode and Inspector for interactive debugging
 
 ## Technology stack
 
-- Playwright Test with TypeScript
-- Node.js 24 in CI
-- Chromium, Firefox, and WebKit project configuration
-- `dotenv` for local environment variables
-- GitHub Actions for continuous integration
-- Playwright HTML reports and traces
+- Playwright Test
+- TypeScript
+- Node.js and npm
+- Chromium, Firefox and WebKit
+- `dotenv` for local environment configuration
+- GitHub Actions for CI
+
+## Test strategy
+
+The functional tests isolate authentication, inventory, cart, checkout-validation and session behaviours. The E2E test connects the main customer journey from login through order completion and logout.
+
+Each test runs in a fresh Playwright browser context and authenticates independently. This keeps scenarios isolated and avoids sharing browser state between tests.
 
 ## Test coverage
 
-| Layer | Scenario | Primary coverage |
+| Type | Scenario | Primary validation |
 | --- | --- | --- |
 | Functional | Successful login displays the product inventory | Standard-user authentication and inventory access |
-| Functional | Invalid password displays an error and remains on login page | Invalid-credential handling |
+| Functional | Invalid password displays an error and remains on the login page | Invalid-credential handling |
 | Functional | Locked-out user is denied access | Account restriction handling |
 | Functional | Products sort from lowest price to highest price | Complete numeric price ordering |
-| Functional | Adding two products and removing one updates the cart | Cart badge, contents, prices, removal, and item count |
+| Functional | Adding two products and removing one updates the cart | Cart badge, contents, prices, removal and item count |
 | Functional | Required checkout fields prevent continuation | Required-field validation and route protection |
 | Functional | Product name and price remain consistent across inventory, cart and checkout | Cross-page product-data integrity |
-| Functional | Logout returns the user to login and protects the inventory page | Session termination and authenticated-route protection |
-| End-to-end | Standard customer completes the full checkout journey | Login, sorting, cart changes, checkout totals, completion, and logout |
+| Functional | Logout returns the user to login and protects the inventory page | Session termination and protected-route behaviour |
+| E2E | Standard customer completes the full checkout journey | Login, sorting, cart changes, checkout totals, completion and logout |
+
+## Primary E2E journey
+
+The primary journey is reported through named `test.step()` stages:
+
+1. Log in as the standard training user.
+2. Sort products from low to high price.
+3. Add two products and verify the cart.
+4. Remove one product.
+5. Enter synthetic customer information.
+6. Verify the remaining product and order summary.
+7. Complete the order.
+8. Log out to clean up authenticated state.
+
+The summary validation independently calculates the item subtotal, 8% tax with currency rounding, and final total before comparing them with the displayed values.
+
+## Design and reliability decisions
+
+- User-facing roles, visible text, placeholders and SauceDemo `data-test` attributes are preferred over brittle implementation selectors.
+- Product interactions are scoped to the relevant inventory, cart or checkout item container.
+- Web-first assertions wait for expected UI state.
+- URL assertions compare exact pathnames.
+- Sorting validation compares all displayed numeric prices with an independently sorted copy.
+- Checkout totals are validated both textually and numerically.
+- Fixed sleeps, forced clicks and XPath selectors are avoided.
+- Environment variables are validated by name without logging their values.
+- The suite remains intentionally small; its limited duplication does not yet justify Page Objects or custom fixture architecture.
 
 ## Project structure
 
 ```text
 .
-├── .github/workflows/playwright.yml   # CI workflow
-├── docs/demo-guide.md                 # 5–8 minute presentation guide
-├── tests/
-│   ├── functional/
-│   │   ├── login.spec.ts
-│   │   ├── inventory-cart.spec.ts
-│   │   └── checkout-logout.spec.ts
-│   └── e2e/
-│       └── complete-checkout.spec.ts
-├── .env.example                       # Safe local configuration template
-├── playwright.config.ts               # Browser and shared test configuration
-├── package.json                        # Commands and dependencies
-└── package-lock.json                   # Reproducible dependency versions
+|-- .github/workflows/playwright.yml
+|-- docs/demo-guide.md
+|-- tests/
+|   |-- e2e/complete-checkout.spec.ts
+|   `-- functional/
+|       |-- checkout-logout.spec.ts
+|       |-- inventory-cart.spec.ts
+|       `-- login.spec.ts
+|-- .env.example
+|-- .gitignore
+|-- LICENSE
+|-- package.json
+|-- package-lock.json
+|-- playwright.config.ts
+`-- README.md
 ```
 
 ## Prerequisites
 
-- Node.js 24
+- Node.js 20 or newer; CI uses Node.js 24
 - npm
 - Git
 
 ## Installation
 
-From the project directory:
+From the repository root:
 
 ```bash
 npm ci
 npx playwright install
 ```
 
-Use `npx playwright install --with-deps` on Linux or in CI when browser system dependencies are also required.
+On Linux or in CI, install browser system dependencies as well:
 
-## Local environment setup
+```bash
+npx playwright install --with-deps
+```
 
-Copy the tracked template to a local `.env` file:
+## Environment configuration
+
+Create a local `.env` file from the tracked template:
 
 ```powershell
 Copy-Item .env.example .env
@@ -79,55 +129,104 @@ On macOS or Linux:
 cp .env.example .env
 ```
 
-Set the local values for `BASE_URL`, `TEST_USER_USERNAME`, `TEST_USER_PASSWORD`, and `LOCKED_USER_USERNAME`. The test suite validates required variable names without printing their values.
+Set values for:
 
-Never commit `.env`. The repository tracks only `.env.example`, which contains safe placeholders.
+- `BASE_URL`
+- `TEST_USER_USERNAME`
+- `TEST_USER_PASSWORD`
+- `LOCKED_USER_USERNAME`
+
+The credential entries use placeholders, while the base URL identifies the public SauceDemo training site. Keep `.env` local and never commit real credentials.
 
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Run the complete suite across all configured browser projects |
-| `npm run test:chromium` | Run the complete suite in Chromium |
-| `npm run test:functional` | Run the eight functional scenarios in Chromium |
-| `npm run test:e2e` | Run the primary end-to-end journey in Chromium |
-| `npm run test:headed` | Run the primary E2E journey in a visible Chromium window |
-| `npm run test:ui` | Open Playwright UI Mode for interactive execution and debugging |
-| `npm run report` | Open the most recently generated Playwright HTML report |
+| `npm test` | Run all 9 scenarios across all 3 browser projects |
+| `npm run test:chromium` | Run all scenarios in Chromium |
+| `npm run test:functional` | Run the 8 functional scenarios in Chromium |
+| `npm run test:e2e` | Run the primary E2E journey in Chromium |
+| `npm run test:headed` | Run the primary E2E journey in headed Chromium |
+| `npm run test:ui` | Open Playwright UI Mode |
+| `npm run report` | Open the most recently generated HTML report |
 
-## Assertions and reliability practices
+For the Playwright Inspector:
 
-- Tests use user-facing roles, labels, placeholders, visible text, and Swag Labs `data-test` attributes.
-- Product operations are scoped to their inventory, cart, or checkout item containers.
-- Web-first assertions automatically wait for expected UI state.
-- URL assertions compare exact pathnames so login, inventory, cart, and checkout routes cannot be confused.
-- Each test receives a fresh browser context and authenticates independently.
-- Sorting checks compare every displayed numeric price with an independently sorted copy.
-- Checkout calculations verify item total, 8% tax, and final total numerically and textually.
-- Fixed sleeps, forced clicks, XPath, and brittle positional selectors are avoided.
+```bash
+npx playwright test tests/e2e/complete-checkout.spec.ts --project=chromium --debug
+```
 
-## Reports, traces, and failure evidence
+## Cross-browser execution
 
-The suite uses Playwright's HTML reporter. After a run, open the report with:
+The default command runs every scenario in Chromium, Firefox and WebKit:
+
+```bash
+npm test
+```
+
+This produces 27 executions:
+
+```text
+9 scenarios × 3 browser engines = 27 executions
+```
+
+## Reports and debugging
+
+Playwright writes its HTML report to `playwright-report`:
 
 ```bash
 npm run report
 ```
 
-The configuration captures a trace on the first retry. CI enables retries, so intermittent failures can be investigated through the trace timeline, network activity, DOM snapshots, and action history. Playwright also records available failure context under `test-results`, while the HTML report is written to `playwright-report`.
+Tracing is configured for the first retry. On CI, failed initial attempts can therefore provide trace timelines, DOM snapshots, network activity and action history for investigation.
 
-Treat reports and traces as potentially sensitive because browser state can contain entered test data. Do not publish artifacts from real production environments without appropriate access controls and retention rules.
+UI Mode and the Playwright Inspector support interactive local debugging. Generated reports, traces and test results are ignored by Git.
 
-## CI/CD
+## GitHub Actions CI
 
-The GitHub Actions workflow runs on pushes and pull requests to `main`, and it supports manual execution. It uses Ubuntu and Node.js 24, installs locked npm dependencies and Playwright browser dependencies, then runs the complete suite.
+The CI workflow runs:
 
-The Playwright HTML report is uploaded even when tests fail and retained for 14 days, giving reviewers a consistent diagnostic artifact without keeping training evidence indefinitely.
+- On pushes to `main`
+- On pull requests targeting `main`
+- Through manual `workflow_dispatch`
+
+It uses Ubuntu and Node.js 24, installs dependencies with `npm ci`, installs the three Playwright browser engines and their system dependencies, and runs the complete suite through `npm test`.
+
+The HTML report is uploaded even when tests fail and retained for 14 days. The workflow performs continuous integration only; it does not deploy or publish an application.
 
 ## Security
 
-`.env` is intentionally excluded from source control. The workflow uses only Swag Labs' publicly supplied training credentials. Any real credentials or production secrets must be stored in GitHub Secrets and referenced through the workflow environment rather than committed to YAML, tests, documentation, or reports.
+- `.env` and environment variants are excluded from source control, while `.env.example` remains tracked.
+- The workflow contains only SauceDemo's public training credentials.
+- Real credentials belong in GitHub Secrets and should be passed through workflow environment variables.
+- Reports and traces can contain entered browser data and should be reviewed before external sharing.
 
-## Project scope
+## Limitations and future improvements
 
-This portfolio project targets [https://www.saucedemo.com](https://www.saucedemo.com) and demonstrates authentication, inventory, cart, checkout, order-completion, logout, regression, reporting, and CI workflows.
+This focused portfolio suite does not currently include:
+
+- Page Object Model or reusable custom fixtures
+- API testing
+- Visual-regression testing
+- Performance or load testing
+- Formal accessibility testing
+- Docker
+- Scheduled regression runs
+- Application deployment or continuous delivery
+
+If the suite grows, repeated setup and page interactions could be moved into fixtures or Page Objects. Additional test layers or scheduled execution should be introduced only when project scope and risk justify them.
+
+## Evidence recommendations
+
+Before making the repository public, consider adding carefully cropped or redacted evidence of:
+
+1. A successful GitHub Actions run.
+2. Playwright UI Mode focused on the order-summary assertion.
+3. The HTML report showing the named E2E steps.
+4. Optionally, a short GIF of the headed E2E run.
+
+Do not include local paths, usernames, email addresses, credentials, unrelated tabs or private repository information. Add a CI badge only after the repository is public and the badge URL has been verified.
+
+## Licence
+
+This project is available under the [MIT License](LICENSE).

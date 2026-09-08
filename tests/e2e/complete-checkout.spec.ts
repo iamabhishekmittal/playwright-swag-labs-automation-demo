@@ -151,9 +151,9 @@ test('standard customer completes the full checkout journey', async ({ page }) =
     await expect(page).toHaveURL(
       (url) => url.pathname === '/checkout-step-one.html',
     );
-    await page.getByPlaceholder('First Name').fill('Abhishek');
-    await page.getByPlaceholder('Last Name').fill('Test');
-    await page.getByPlaceholder('Zip/Postal Code').fill('4215');
+    await page.getByPlaceholder('First Name').fill('Test');
+    await page.getByPlaceholder('Last Name').fill('User');
+    await page.getByPlaceholder('Zip/Postal Code').fill('2000');
     await page.getByRole('button', { name: 'Continue' }).click();
 
     await expect(page).toHaveURL(

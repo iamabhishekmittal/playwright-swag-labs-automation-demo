@@ -1,42 +1,49 @@
 # Swag Labs Automation Demo Guide
 
-This guide supports a focused 5–8 minute portfolio demonstration.
+This guide supports a focused 5–8 minute technical demonstration of the repository.
 
-## 1. Opening — 30–45 seconds
+## 1. Introduce the project — 30–45 seconds
 
-“This project demonstrates a maintainable Playwright TypeScript test suite for Swag Labs. It covers focused authentication, inventory, cart, checkout, and session behaviours, then brings them together in a primary end-to-end customer journey. The same suite runs locally and in GitHub Actions.”
+Suggested opening:
 
-## 2. Project structure — 45–60 seconds
+> This is an independent personal portfolio project demonstrating Playwright and TypeScript browser automation against SauceDemo. SauceDemo is a third-party public training application that I do not own or maintain. The suite contains eight focused functional scenarios and one complete checkout journey.
 
-Show these areas in the editor:
+Explain that all nine scenarios run across Chromium, Firefox and WebKit, producing 27 executions.
 
-- `playwright.config.ts`: shared base URL, `data-test` support, browser projects, retries, reporter, and tracing.
-- `tests/functional`: eight independently executable scenarios grouped by feature.
+## 2. Show the structure — 45–60 seconds
+
+Open these areas:
+
+- `playwright.config.ts`: environment-based URL, `data-test` support, browser projects, CI retries, HTML reporting and tracing.
+- `tests/functional`: eight scenarios grouped by feature.
 - `tests/e2e/complete-checkout.spec.ts`: the complete customer journey.
-- `.github/workflows/playwright.yml`: automated CI execution and report upload.
-- `.env.example`: safe documentation of required local configuration.
+- `.github/workflows/playwright.yml`: CI execution and report upload.
+- `.env.example`: placeholders for required local configuration.
 
-Emphasise that `.env` remains local and is never committed.
+Note that `.env`, reports and test results remain local and are not tracked.
 
-## 3. Functional, E2E, and regression testing — 45–60 seconds
+## 3. Explain the test strategy — 45–60 seconds
 
-- **Functional tests** isolate one behaviour, such as locked-user login, price sorting, cart removal, or checkout validation. Failures are focused and quick to diagnose.
-- **End-to-end testing** validates that the major components work together across the complete customer journey, from authentication through order completion and logout.
-- **Regression testing** runs all nine scenarios after changes to detect unintended effects across established behaviour.
+- Functional tests isolate authentication, sorting, cart, checkout-validation and session behaviours.
+- The E2E scenario validates the connected journey from login through order completion and logout.
+- Every test receives a fresh browser context and authenticates independently.
+- Running the suite after changes provides repeatable regression feedback.
 
-## 4. Key code sections — 90–120 seconds
+## 4. Highlight implementation decisions — 90–120 seconds
 
-Show two or three of these sections:
+Choose two or three examples:
 
-1. **Credential validation and login helper** in `complete-checkout.spec.ts`: environment variables are validated by name, and values are never logged.
-2. **Container-scoped product interactions** in `inventory-cart.spec.ts`: each action starts from an inventory or cart item identified by its visible product name.
-3. **Structured E2E reporting and checkout calculations** in `complete-checkout.spec.ts`: `test.step()` creates readable stages, while item total, 8% tax, and final total are verified numerically and against displayed labels.
+1. **Container-scoped interactions** in `inventory-cart.spec.ts`: actions begin from the item containing the exact product name.
+2. **Numeric sorting validation** in `inventory-cart.spec.ts`: all displayed prices are converted to numbers and compared with an independently sorted copy.
+3. **Checkout calculations** in `complete-checkout.spec.ts`: subtotal, 8% tax with rounding and final total are independently calculated.
+4. **Readable E2E reporting** in `complete-checkout.spec.ts`: eight named `test.step()` stages make the report easy to follow.
+5. **Environment validation**: required variable names are reported when missing, but values are never logged.
 
-Call out exact pathname checks and Playwright's web-first assertions as safeguards against false positives.
+Point out the semantic and test-ID locators, exact pathname checks, web-first assertions, and absence of fixed sleeps or forced clicks.
 
-## 5. Visible E2E execution — 60–90 seconds
+## 5. Run the E2E demonstration — 60–90 seconds
 
-Run this exact command from the project directory:
+Run:
 
 ```bash
 npm run test:headed
@@ -44,63 +51,78 @@ npm run test:headed
 
 Ask the audience to watch for:
 
-- Successful standard-user login and the Products view.
+- Standard-user login.
 - Low-to-high product sorting.
-- Two products added, followed by one removal and the cart badge changing from 2 to 1.
-- Customer information entry and checkout overview.
-- Item total `$7.99`, tax `$0.64`, and final total `$8.63`.
-- The “Thank you for your order!” confirmation.
-- Logout returning the browser to the login page.
+- Two additions followed by one removal.
+- Synthetic customer information entry.
+- Item total `$7.99`, tax `$0.64` and final total `$8.63`.
+- Order confirmation.
+- Logout returning to the login page.
 
-## 6. HTML report — 30–45 seconds
+## 6. Show debugging and reporting — 45–60 seconds
 
-After execution, run:
+Open the latest HTML report:
 
 ```bash
 npm run report
 ```
 
-Show the test result, the eight named E2E steps, durations, and available failure details. Explain that CI traces are captured on the first retry to support deeper investigation of intermittent failures.
+Show the named E2E steps, duration and available failure details.
 
-## 7. CI/CD — 30–45 seconds
+For interactive exploration, use UI Mode:
 
-Open `.github/workflows/playwright.yml` and explain that GitHub Actions:
+```bash
+npm run test:ui
+```
 
-- Runs for pushes and pull requests to `main`, or manually.
+For the Playwright Inspector:
+
+```bash
+npx playwright test tests/e2e/complete-checkout.spec.ts --project=chromium --debug
+```
+
+Explain that CI captures a trace on the first retry for investigating intermittent failures.
+
+## 7. Explain GitHub Actions CI — 30–45 seconds
+
+The workflow:
+
+- Runs on pushes and pull requests to `main`, or manually.
 - Uses Node.js 24 on `ubuntu-latest`.
-- Performs a reproducible `npm ci` installation.
-- Installs Playwright browsers and operating-system dependencies.
-- Runs the complete suite.
-- Uploads the HTML report even if tests fail and retains it for 14 days.
+- Installs locked npm dependencies and Playwright browser dependencies.
+- Runs all 27 cross-browser executions through `npm test`.
+- Uploads the HTML report even after failures and retains it for 14 days.
 
-The checked-in workflow values are public Swag Labs training credentials. Real credentials belong in GitHub Secrets.
+This is continuous integration only. It does not deploy, release or publish an application. The checked-in workflow values are public SauceDemo training credentials; real credentials belong in GitHub Secrets.
 
-## 8. Closing — 20–30 seconds
+## 8. Close — 20–30 seconds
 
-“This independent portfolio project demonstrates fast functional feedback, confidence in the complete customer journey, clear failure diagnostics, and repeatable CI quality gates. Its structure is small enough to understand quickly and disciplined enough to extend safely.”
+Suggested closing:
+
+> The repository demonstrates focused functional coverage, a readable end-to-end journey, cross-browser execution and practical failure diagnostics. The implementation is intentionally small and can adopt fixtures or Page Objects later if its size makes that structure worthwhile.
 
 ## Likely questions
 
-**Why use both visible text and `data-test` attributes?**
+### Why combine visible text and `data-test` attributes?
 
-Visible text validates the user experience, while stable `data-test` attributes provide precise scoping for repeated UI components.
+Visible text validates user-observable content. Stable `data-test` attributes provide precise scoping for repeated interface components.
 
-**Why keep functional and E2E tests separate?**
+### Why separate functional and E2E tests?
 
-Functional tests identify localised defects quickly; the E2E test proves the complete business journey works across pages.
+Focused scenarios make failures easier to locate, while the E2E scenario checks that the main journey works across pages.
 
-**How are flaky tests avoided?**
+### How does the suite reduce flaky behaviour?
 
-The suite uses web-first assertions, automatic locator waiting, isolated contexts, exact routes, and no fixed sleeps or forced clicks.
+It uses Playwright's automatic waiting, web-first assertions, isolated contexts, exact route checks and no fixed sleeps or forced clicks.
 
-**Can this run in other browsers?**
+### Does it run in multiple browsers?
 
-Yes. Chromium, Firefox, and WebKit are configured; the demonstration scripts focus on Chromium for speed and consistency.
+Yes. Chromium, Firefox and WebKit are configured locally and in the complete CI suite.
 
-**How should real credentials be handled?**
+### How should real credentials be handled?
 
-Keep them out of the repository, store them in GitHub Secrets, and limit report and trace access because artifacts may contain browser state.
+Keep them out of the repository, store them in GitHub Secrets, and review reports and traces before sharing because artifacts may contain browser state.
 
-**What is the next practical extension?**
+### What would you improve next?
 
-Add reusable fixtures or page objects when the suite grows, then introduce cross-browser and scheduled regression jobs according to project risk.
+Only as the suite grows: extract genuinely repeated setup into fixtures or Page Objects, and add other test layers when project requirements justify them.

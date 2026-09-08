@@ -1,8 +1,8 @@
 {
-  "name": "playwright-automation-demo",
+  "name": "playwright-swag-labs-automation-demo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Independent Playwright and TypeScript browser-automation portfolio project for SauceDemo.",
   "scripts": {
     "test": "playwright test",
     "test:chromium": "playwright test --project=chromium",
@@ -12,10 +12,19 @@
     "test:ui": "playwright test --ui",
     "report": "playwright show-report"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "browser-automation",
+    "end-to-end-testing",
+    "qa-automation",
+    "saucedemo"
+  ],
+  "license": "MIT",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
